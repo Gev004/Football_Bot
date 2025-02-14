@@ -3,6 +3,7 @@ from telebot.types import Message
 from loader import bot
 from utils.api_requests import fetch_api_data
 from config_data.config import url_leagues
+from utils.utils import save_search
 
 @bot.message_handler(commands=["league"])
 def league_by_name(message: Message):
@@ -31,5 +32,7 @@ def process_league_search(message: Message):
         f"Флаг: {league_info['country']['flag']}"
     )
 
-    bot.send_message(message.chat.id, league_details)
+    save_search(message.chat.id,"Лига:",league_info['league']['name'])
+
+    bot.send_message(message.chat.id,league_details)
 

@@ -6,6 +6,9 @@ from utils.api_requests import fetch_api_data
 from config_data.config import url_leagues, url_players
 import time
 
+from utils.utils import save_search
+
+
 @bot.message_handler(commands=["stats"])
 def player_stats_command(message: Message):
     bot.send_message(message.chat.id, "Введите имя игрока:")
@@ -109,7 +112,6 @@ def fetch_career_statistics(message: Message, player_name: str):
                 if stat["goals"].get("assists") is not None:
                     total_assists += stat["goals"]["assists"]
 
-    print(final_data)
 
     player_info = final_data["response"][0]["player"]
 
@@ -121,5 +123,8 @@ def fetch_career_statistics(message: Message, player_name: str):
         f"Голы за карьеру: {total_goals}\n"
         f"Ассисты за карьеру: {total_assists}"
     )
+
+    save_search(message.chat.id,f"Статистика игрока:", player_name)
+
 
     bot.send_message(message.chat.id, career_stats)

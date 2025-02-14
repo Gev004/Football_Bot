@@ -8,6 +8,7 @@ COMMANDS = [
     BotCommand("stats", "Статистика игрока"),
     BotCommand("league", "Поиск лиги"),
     BotCommand("team", "Поиск команды"),
+    BotCommand("history", "История поиска")
 ]
 
 bot.set_my_commands(COMMANDS)

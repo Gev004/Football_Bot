@@ -3,6 +3,8 @@ from telebot.types import Message
 from loader import bot
 from utils.api_requests import fetch_api_data
 from config_data.config import url_teams
+from utils.utils import save_search
+
 
 @bot.message_handler(commands=["team"])
 def team_by_name(message: Message):
@@ -29,6 +31,9 @@ def process_team_search(message: Message):
         f"🔗 Логотип: {team_info['team']['logo']}\n"
         f"🔗 Фото стадиона: {team_info['venue']['image']}"
     )
+
+    save_search(message.chat.id, "Поиск по команде:",team_info['team']['name'])
+
 
     bot.send_message(message.chat.id, team_details)
 

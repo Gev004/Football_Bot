@@ -5,6 +5,7 @@ import json
 from loader import bot
 from config_data.config import API_KEY, url_leagues, url_players
 from utils.api_requests import fetch_api_data
+from utils.utils import save_search
 
 
 @bot.message_handler(commands=["search_by_name"])
@@ -70,6 +71,8 @@ def fetch_player_info(message: Message, player_name: str):
         f"⚽ Команда: {statistics['team']['name']}\n"
         f"📍 Позиция: {statistics['games']['position']}\n"
     )
+
+    save_search(message.chat.id, "Поиск по имени",player_name)
 
     bot.send_message(message.chat.id, player_details)
 
