@@ -23,16 +23,17 @@ def process_league_search(message: Message):
 
     if not league_info:
         bot.send_message(message.chat.id, f"Лига '{league_name}' не найдена.")
+        save_search(message.chat.id, "❌Лига:", league_name)
         return
 
     league_details = (
-        f"Название лиги: {league_info['league']['name']}\n"
+        f"Название лиги: {league_info['league']['name'].upper()}\n"
         f"Страна: {league_info['country']['name']}\n"
         f"Логотип: {league_info['league']['logo']}\n"
         f"Флаг: {league_info['country']['flag']}"
     )
 
-    save_search(message.chat.id,"Лига:",league_info['league']['name'])
+    save_search(message.chat.id,"✅Лига:",league_info['league']['name'])
 
     bot.send_message(message.chat.id,league_details)
 

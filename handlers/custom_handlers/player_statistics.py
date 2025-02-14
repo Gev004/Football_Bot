@@ -11,7 +11,7 @@ from utils.utils import save_search
 
 @bot.message_handler(commands=["stats"])
 def player_stats_command(message: Message):
-    bot.send_message(message.chat.id, "Введите имя игрока:")
+    bot.send_message(message.chat.id, "Введите фамилию игрока:")
     bot.register_next_step_handler(message, ask_for_specific_year)
 
 def ask_for_specific_year(message: Message):
@@ -92,6 +92,7 @@ def fetch_career_statistics(message: Message, player_name: str):
 
     if not player_id:
         bot.reply_to(message, f"Игрок '{player_name}' не найден.")
+        save_search(message.chat.id, "❌Статистика игрока: ", player_name)
         return
 
     current_year = datetime.datetime.now().year
@@ -113,18 +114,16 @@ def fetch_career_statistics(message: Message, player_name: str):
                     total_assists += stat["goals"]["assists"]
 
 
-    player_info = final_data["response"][0]["player"]
 
     career_stats = (
-        f"Игрок: {player_name}\n"
-        f"Возраст: {player_info.get('age')}\n"
-        f"Национальность: {player_info.get('nationality')}\n"
+        "Статистика начиная с 2000 года \n"
+        f"Игрок: {player_name.capitalize()}\n"
         f"Матчи за карьеру: {total_matches}\n"
         f"Голы за карьеру: {total_goals}\n"
         f"Ассисты за карьеру: {total_assists}"
     )
 
-    save_search(message.chat.id,f"Статистика игрока:", player_name)
+    save_search(message.chat.id,"✅Статистика игрока: ", player_name)
 
 
     bot.send_message(message.chat.id, career_stats)

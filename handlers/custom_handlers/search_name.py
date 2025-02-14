@@ -1,3 +1,4 @@
+import time
 from telebot.types import Message
 import requests
 import datetime
@@ -10,7 +11,7 @@ from utils.utils import save_search
 
 @bot.message_handler(commands=["search_by_name"])
 def start_search_by_name(message: Message):
-    bot.send_message(message.chat.id, "Введите имя игрока:")
+    bot.send_message(message.chat.id, "Введите фамилию игрока:")
     bot.register_next_step_handler(message, process_player_search)
 
 
@@ -35,12 +36,21 @@ def fetch_player_info(message: Message, player_name: str):
         bot.send_message(message.chat.id, "Ошибка при загрузке данных лиг.")
         return
 
+    count = 0
     play_id = None
     for league in leagues_data["response"]:
-        league_id = league["league"]["id"]
-        params = {"league": str(league_id), "search": player_name}
-        response = requests.get(url_players, headers=headers, params=params)
-        player_data = response.json()
+        if count > 15:
+            time.sleep(5)
+            league_id = league["league"]["id"]
+            params = {"league": str(league_id), "search": player_name}
+            response = requests.get(url_players, headers=headers, params=params)
+            player_data = response.json()
+        else:
+            league_id = league["league"]["id"]
+            params = {"league": str(league_id), "search": player_name}
+            response = requests.get(url_players, headers=headers, params=params)
+            player_data = response.json()
+        count += 1
 
         if "response" in player_data and player_data["response"]:
             play_id = player_data["response"][0]["player"]["id"]
@@ -56,13 +66,14 @@ def fetch_player_info(message: Message, player_name: str):
 
     if "response" not in final_data or not final_data["response"]:
         bot.send_message(message.chat.id, "Ошибка: Нет детальных данных о игроке.")
+        save_search(message.chat.id, "❌Поиск по имени", player_name)
         return
 
     player_info = final_data["response"][0]["player"]
     statistics = final_data["response"][0]["statistics"][0]
 
     player_details = (
-        f"👤 Имя: {player_name}\n"
+        f"👤 Имя: {player_name.capitalize()}\n"
         f"🎂 озраст: {player_info['age']}\n"
         f"🌍 Национальность: {player_info['nationality']}\n"
         f"📏 Рост: {player_info.get('height', 'N/A')}\n"
@@ -72,7 +83,7 @@ def fetch_player_info(message: Message, player_name: str):
         f"📍 Позиция: {statistics['games']['position']}\n"
     )
 
-    save_search(message.chat.id, "Поиск по имени",player_name)
+    save_search(message.chat.id, "✅Поиск по имени",player_name)
 
     bot.send_message(message.chat.id, player_details)
 

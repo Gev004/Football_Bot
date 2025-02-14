@@ -15,14 +15,14 @@ def process_team_search(message: Message):
     team_name = message.text.strip()
     params = {"search": team_name}
     teams_data = fetch_api_data(url_teams, params)
-
     if "response" not in teams_data or not teams_data["response"]:
         bot.send_message(message.chat.id, f"Команда '{team_name}' не найдена.")
+        save_search(message.chat.id, "❌Поиск по команде:",team_name)
         return
 
     team_info = teams_data["response"][0]
     team_details = (
-        f"🏆 Название команды: {team_info['team']['name']}\n"
+        f"🏆 Название команды: {team_info['team']['name'].capitalize()}\n"
         f"🌍 Страна: {team_info['team']['country']}\n"
         f"📅 Основана: {team_info['team']['founded']}\n"
         f"🏟️ Стадион: {team_info['venue']['name']}\n"
@@ -32,7 +32,8 @@ def process_team_search(message: Message):
         f"🔗 Фото стадиона: {team_info['venue']['image']}"
     )
 
-    save_search(message.chat.id, "Поиск по команде:",team_info['team']['name'])
+
+    save_search(message.chat.id, "✅Поиск по команде:",team_info['team']['name'])
 
 
     bot.send_message(message.chat.id, team_details)
